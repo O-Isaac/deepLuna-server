@@ -1,4 +1,4 @@
-from libs.deepLuna.luna.translation_db import TranslationDb
+from libs.deepLuna.luna.translation_db import TranslationDb, ReadableExporter
 
 import pandas as pd
 import time
@@ -52,5 +52,7 @@ class TranslationUtils:
         current_time = time.strftime('%Y%m%d-%H%M%S')
         output_name = f"script_text_translated{current_time}.mrg"
         mzp_data = self.db_tl.generate_script_text_mrg()
-
         return [output_name, mzp_data]
+    
+    def export_current_tl_scene(self, scene_name):
+        return ReadableExporter.export_text(self.db_tl, scene_name).encode('utf-8')

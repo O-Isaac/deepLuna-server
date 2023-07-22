@@ -2,8 +2,6 @@ from translation import TranslationUtils
 from flask import Flask, send_file, request
 from io import StringIO, BytesIO
 
-import pandas as pd
-
 app = Flask(__name__)
 tl = TranslationUtils()
 
@@ -21,6 +19,14 @@ def get_scene(scene_id):
         return csv_text
     except Exception as error:
         return "Not Found", 404
+    
+@app.route('/api/sheets/current/<scene_id>', methods=['GET'])
+def export_scene(scene_id):
+    try:
+        return tl.export_current_tl_scene(scene_id)
+    except Exception as error:
+        return "Not Found", 404
+
     
 @app.route('/api/database/gen', methods=['GET'])
 def renegare_db():
