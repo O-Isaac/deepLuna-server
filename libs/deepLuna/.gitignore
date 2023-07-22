@@ -1,0 +1,33 @@
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Game script specific files #
+##############################
+*.mrg
+*.txt
+*.DAT
+*.bms
+
+# Configuration file #
+######################
+*.ini
+*.BAK
+
+# Bit-compiled code #
+#####################
+__pycache__/
+mzx/__pycache__/
+DEBUG/
+BACKUP/
+update/
+export/
+
+# Ignore translation database
+deepluna_db.json
