@@ -43,29 +43,6 @@ class Utils:
 
         return "\n ".join(wrapped_text).strip().replace("  ", " ")
     
-    @staticmethod
-    def adjust_quotes(text: str, text_original: str) -> str:
-        text_without_quotes = text.replace('"', '')
-        text_without_quote = text.replace('"', '')
-
-        quote = "'"
-        double_quote = '"'
-
-        if text_original.startswith(double_quote) and text_original.endswith(double_quote):
-            text = double_quote + text_without_quotes + double_quote
-        elif text_original.startswith(double_quote) and not text_original.endswith(double_quote):
-            text = double_quote + text_without_quotes
-        elif text_original.endswith(double_quote) and not text_original.startswith(double_quote):
-            text = text_without_quotes + double_quote
-
-        if text_original.startswith(quote) and text_original.endswith(quote):
-            text = quote + text_without_quote + quote
-        elif text_original.startswith(quote) and not text_original.endswith(quote):
-            text = quote + text_without_quote
-        elif text_original.endswith(quote) and not text_original.startswith(quote):
-            text = text_without_quote + quote
-
-        return text
 
 class TranslationUtils:
     "Utils for translation"
@@ -115,9 +92,7 @@ class TranslationUtils:
                     print(Color(Color.YELLOW)(f"{sceneId} | {line_hash} | Missing line skipping..."))
                     continue
                 
-                text_quotes_fix = Utils.adjust_quotes(line_text_translated, fila["english"])
-
-                self.db_tl.set_translation_and_comment_for_hash(line_hash, Utils.adjust_text_width(text_quotes_fix), "")
+                self.db_tl.set_translation_and_comment_for_hash(line_hash, Utils.adjust_text_width(line_text_translated), "")
                 print(Color(Color.BLUE)(f"{sceneId} | {line_hash} | line successfully replaced."))
         except Exception as ex:
             print(ex)
