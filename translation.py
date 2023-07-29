@@ -1,13 +1,12 @@
 from libs.deepLuna.luna.translation_db import TranslationDb, ReadableExporter, RubyUtils
 from libs.deepLuna.luna.constants import Constants
-from math import isnan, ceil
+
+from math import isnan
 from textwrap import wrap
-from difflib import get_close_matches
-from tempfile import NamedTemporaryFile
 
 import pandas as pd
 import time
-import os
+
 
 class Color:
     RED = '\033[31m'
@@ -79,7 +78,7 @@ class TranslationUtils:
 
         return df
 
-    def process_scene_csv(self, lines_csv, sceneId):
+    def process_scene_csv(self, lines_csv, sceneId, logger=None):
         try:
             df = pd.read_csv(lines_csv)
 
@@ -87,15 +86,27 @@ class TranslationUtils:
                 line_hash: str = fila["hash"]
                 line_text_translated: str = fila["spanish"]
 
-
                 if Utils.check_int_or_float(line_text_translated) and Utils.is_nan(line_text_translated):
-                    print(Color(Color.YELLOW)(f"{sceneId} | {line_hash} | Missing line skipping..."))
+                    if logger:
+                        logger.info(f"{sceneId} - {line_hash} - Missing line skipping...")
+                    else: 
+                        print(Color(Color.YELLOW)(f"{sceneId} | {line_hash} | Missing line skipping..."))
+
                     continue
                 
                 self.db_tl.set_translation_and_comment_for_hash(line_hash, Utils.adjust_text_width(line_text_translated), "")
-                print(Color(Color.BLUE)(f"{sceneId} | {line_hash} | line successfully replaced."))
+                if logger:
+                    logger.info(f"{sceneId} - {line_hash} - line successfully replaced.")
+                else:
+                    print(Color(Color.BLUE)(f"{sceneId} | {line_hash} | line successfully replaced."))
+
+
         except Exception as ex:
+            if logger:
+                logger.error(f'{sceneId} - {ex} - Unknow hash please update sheet!')
+            
             print(ex)
+                
 
     def generate_db_file(self):
         "Regenerate database"

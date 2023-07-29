@@ -1,9 +1,16 @@
 from translation import TranslationUtils
-from flask import Flask, send_file, request, render_template_string
+from flask import Flask, send_file, request
 from io import StringIO, BytesIO
+from itertools import chain
+from utils import create_logger
+
+import pandas as pd
+import pygsheets
 
 app = Flask(__name__)
-tl = TranslationUtils(database_path="database.json")
+tl = TranslationUtils(database_path="assets/database.json")
+gs = pygsheets.authorize(service_file="assets/certificate.json")
+
 
 @app.route('/api/sheets/get/<scene_id>', methods=['GET'])
 def get_scene(scene_id):
@@ -135,7 +142,36 @@ def upload_csv():
     except Exception as e:
         return "Error", 500
 
+@app.route('/api/sheet/pull/<sheet_id>', methods=['GET'])
+def pull_sheet(sheet_id):
+    try:
+        stream, logger = create_logger(sheet_id)
+        spreadsheet = gs.open_by_key(sheet_id)
+        indice = spreadsheet.worksheet_by_title('Indice')
+        
+        # Process ids
+        cell_ids = indice.get_values(
+            "A3", 
+            "A", 
+            include_tailing_empty_rows=False, 
+            include_tailing_empty=False
+        )
+
+        # Delete first title
+        del cell_ids[:2]
+
+        # Get Each worksheet
+        for cell_id in list(chain(*cell_ids)):
+            scene_worksheet = spreadsheet.worksheet_by_title(cell_id)
+            scene_csv = scene_worksheet.get_values("1", "1000", include_tailing_empty_rows=False, include_tailing_empty=False)
+
+            df = pd.DataFrame(scene_csv)
+            lines = df.to_csv(header=False, index=False)
+            tl.process_scene_csv(StringIO(lines), cell_id, logger)
+
+        return stream.getvalue(), 200, {'Content-Type': 'text/plain; charset=utf8'}
+    except Exception as e:
+        return "Error", 500
+
 if __name__ == '__main__':
     app.run(debug=True)
-
-    

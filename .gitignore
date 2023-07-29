@@ -1,2 +1,3 @@
 *.mrg
 __pycache__/
+certificate.json
