@@ -67,8 +67,8 @@ def export_scene(scene_id):
         print(error)
         return "Not Found", 404
 
-@app.route('/api/database/gen', methods=['GET'])
-def renegare_db():
+@app.route('/api/database/save', methods=['GET'])
+def save_database():
     """
     Save the current translation state in a database file.
 
